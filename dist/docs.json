@@ -7,7 +7,7 @@
     "methods": [
       {
         "name": "startworkflow",
-        "signature": "(options: { workflowRunId: string; token: string; }) => Promise<{ value: string; }>",
+        "signature": "(options: { workflowRunId: string; token: string; }) => Promise<{ status: string; message: string; code?: string; }>",
         "parameters": [
           {
             "name": "options",
@@ -15,7 +15,7 @@
             "type": "{ workflowRunId: string; token: string; }"
           }
         ],
-        "returns": "Promise<{ value: string; }>",
+        "returns": "Promise<{ status: string; message: string; code?: string | undefined; }>",
         "tags": [],
         "docs": "",
         "complexTypes": [],

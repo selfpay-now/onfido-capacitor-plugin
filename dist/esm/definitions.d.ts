@@ -3,6 +3,8 @@ export interface SelfPayOnfidoPlugin {
         workflowRunId: string;
         token: string;
     }): Promise<{
-        value: string;
+        status: string;
+        message: string;
+        code?: string;
     }>;
 }

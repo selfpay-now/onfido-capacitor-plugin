@@ -23,14 +23,14 @@ npx cap sync
 ### startworkflow(...)
 
 ```typescript
-startworkflow(options: { workflowRunId: string; token: string; }) => Promise<{ value: string; }>
+startworkflow(options: { workflowRunId: string; token: string; }) => Promise<{ status: string; message: string; code?: string; }>
 ```
 
 | Param         | Type                                                   |
 | ------------- | ------------------------------------------------------ |
 | **`options`** | <code>{ workflowRunId: string; token: string; }</code> |
 
-**Returns:** <code>Promise&lt;{ value: string; }&gt;</code>
+**Returns:** <code>Promise&lt;{ status: string; message: string; code?: string; }&gt;</code>
 
 --------------------
 

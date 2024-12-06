@@ -45,7 +45,7 @@ class SelfPayOnfidoPlugin : Plugin() {
             return
         }
 
-        onfidoWorkflow?.handleActivityResult(1, activity.intent, object : OnfidoWorkflow.ResultListener {
+        onfidoWorkflow?.handleActivityResult(result.resultCode, result.data, object : OnfidoWorkflow.ResultListener {
             override fun onUserCompleted() {
                 Log.d("OnfidoWorkflow", "Workflow completed successfully.")
                 val result = JSObject()
