@@ -13,24 +13,24 @@ npx cap sync
 
 <docgen-index>
 
-* [`echo(...)`](#echo)
+* [`startWorkFlow(...)`](#startworkflow)
 
 </docgen-index>
 
 <docgen-api>
 <!--Update the source file JSDoc comments and rerun docgen to update the docs below-->
 
-### echo(...)
+### startWorkFlow(...)
 
 ```typescript
-echo(options: { value: string; }) => Promise<{ value: string; }>
+startWorkFlow(options: { workflowRunId: string; token: string; }) => Promise<{ status: string; message: string; }>
 ```
 
-| Param         | Type                            |
-| ------------- | ------------------------------- |
-| **`options`** | <code>{ value: string; }</code> |
+| Param         | Type                                                   |
+| ------------- | ------------------------------------------------------ |
+| **`options`** | <code>{ workflowRunId: string; token: string; }</code> |
 
-**Returns:** <code>Promise&lt;{ value: string; }&gt;</code>
+**Returns:** <code>Promise&lt;{ status: string; message: string; }&gt;</code>
 
 --------------------
 
