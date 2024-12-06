@@ -1,28 +1,26 @@
 package com.selfpay.onfido
 
-import android.content.Intent
 import android.util.Log
-import androidx.activity.result.ActivityResult
-import com.getcapacitor.JSObject
 import com.getcapacitor.Plugin
 import com.getcapacitor.PluginCall
 import com.getcapacitor.PluginMethod
-import com.getcapacitor.annotation.ActivityCallback
 import com.getcapacitor.annotation.CapacitorPlugin
-import com.onfido.android.sdk.capture.ExitCode
 import com.onfido.workflow.OnfidoWorkflow
 import com.onfido.workflow.WorkflowConfig
 
-
 @CapacitorPlugin(name = "SelfPayOnfido")
 class SelfPayOnfidoPlugin : Plugin() {
-    private final var onfidoWorkflow: OnfidoWorkflow? = null
+
+    companion object {
+        private const val REQUEST_CODE = 6253465
+    }
 
     @PluginMethod
-    fun startWorkFlow(call: PluginCall) {
+    fun startworkflow(call: PluginCall) {
+
         val token = call.getString("token")
         val workflowRunId = call.getString("workflowRunId")
-        //todo: throw if any of the above 2 are null or empty
+
         try {
             val workflowConfig = WorkflowConfig.Builder(
                 workflowRunId = workflowRunId!!,
@@ -30,52 +28,21 @@ class SelfPayOnfidoPlugin : Plugin() {
             ).build()
 
             val currentActivity = activity
-            this.onfidoWorkflow = OnfidoWorkflow.create(currentActivity)
-            startActivityForResult(call, onfidoWorkflow!!.createIntent(workflowConfig), "onfidoFlowFinished");
+            val onfidoWorkflow = OnfidoWorkflow.create(currentActivity)
+            // Start the workflow
+            onfidoWorkflow.startActivityForResult(
+                currentActivity,
+                1,
+                workflowConfig,
+            )
+
         }
         catch (e: Exception) {
-            Log.e("OnfidoWorkflow", "Error starting workflow", e);
-            call.reject("CustomPlugin: Could not initialize the Onfido Workflow")
-        }
-    }
-
-    @ActivityCallback
-    private fun onfidoFlowFinished(call: PluginCall?, result: ActivityResult) {
-        if (call == null) {
-            return
+            Log.e("OnfidoWorkflow", "Error starting workflow", e)
         }
 
-        onfidoWorkflow?.handleActivityResult(1, activity.intent, object : OnfidoWorkflow.ResultListener {
-            override fun onUserCompleted() {
-                Log.d("OnfidoWorkflow", "Workflow completed successfully.")
-                val result = JSObject()
-                result.put("status", "success")
-                result.put("message", "Workflow completed successfully.")
-
-                call.resolve(result)
-            }
-
-            override fun onUserExited(exitCode: ExitCode) {
-                Log.d("OnfidoWorkflow", "onUserExited: $exitCode")
-
-                val error = JSObject()
-                error.put("status", "error")
-                error.put("code", "USEREXITED")
-                error.put("exitCode", exitCode.name) // Assuming `exitCode.name` gives a meaningful string
-
-                call.reject("User exited the flow", error)
-            }
-
-            override fun onException(exception: OnfidoWorkflow.WorkflowException) {
-                call.reject("EXCEPTION")
-                exception.printStackTrace()
-                Log.d("OnfidoWorkflow", "onException: ${exception.message}")
-            }
-        })
+//        val onfidoWorkflow = OnfidoWorkflow.create(activity)
+//        onfidoWorkflow.startActivityForResult(onfidoWorkflow.createIntent(workflowConfig), 1)
     }
 
 }
-
-
-
-

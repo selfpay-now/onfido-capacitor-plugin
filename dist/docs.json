@@ -1,0 +1,31 @@
+{
+  "api": {
+    "name": "SelfPayOnfidoPlugin",
+    "slug": "selfpayonfidoplugin",
+    "docs": "",
+    "tags": [],
+    "methods": [
+      {
+        "name": "startworkflow",
+        "signature": "(options: { workflowRunId: string; token: string; }) => Promise<{ value: string; }>",
+        "parameters": [
+          {
+            "name": "options",
+            "docs": "",
+            "type": "{ workflowRunId: string; token: string; }"
+          }
+        ],
+        "returns": "Promise<{ value: string; }>",
+        "tags": [],
+        "docs": "",
+        "complexTypes": [],
+        "slug": "startworkflow"
+      }
+    ],
+    "properties": []
+  },
+  "interfaces": [],
+  "enums": [],
+  "typeAliases": [],
+  "pluginConfigs": []
+}
