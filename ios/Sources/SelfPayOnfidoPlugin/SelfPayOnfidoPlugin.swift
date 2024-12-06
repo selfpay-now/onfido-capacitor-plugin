@@ -10,12 +10,12 @@ public class SelfPayOnfidoPlugin: CAPPlugin, CAPBridgedPlugin {
     public let identifier = "SelfPayOnfidoPlugin"
     public let jsName = "SelfPayOnfido"
     public let pluginMethods: [CAPPluginMethod] = [
-        CAPPluginMethod(name: "echo", returnType: CAPPluginReturnPromise)
+        CAPPluginMethod(name: "startworkflow", returnType: CAPPluginReturnPromise)
     ]
     private let implementation = SelfPayOnfido()
 
-    @objc func echo(_ call: CAPPluginCall) {
-        let value = call.getString("value") ?? ""
+    @objc func startworkflow(_ call: CAPPluginCall) {
+        let value = call.getString("token") ?? ""
         call.resolve([
             "value": implementation.echo(value)
         ])
