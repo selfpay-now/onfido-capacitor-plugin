@@ -24,12 +24,32 @@ public class SelfPayOnfidoPlugin: CAPPlugin, CAPBridgedPlugin {
                   }
             
             let responseHandler: (OnfidoResponse) -> Void = { [weak self] response in
+                var errorMessage = "An error occurred during the SDK flow."
                 if case let OnfidoResponse.error(error) = response {
-                    let errorDetails: [String: Any] = [
-                        "status": "error",
-                        "message": error.localizedDescription
-                    ]
-                    call.reject("An error occurred during the SDK flow.")
+                    
+                    switch error {
+                    case OnfidoFlowError.microphonePermission:
+                        call.reject(errorMessage, "microphonePermission", nil, nil)
+                        return
+                    case OnfidoFlowError.cameraPermission:
+                        call.reject(errorMessage, "cameraPermission", nil, nil)
+                        return
+                    case OnfidoFlowError.failedToWriteToDisk:
+                        call.reject(errorMessage, "failedToWriteToDisk", nil, nil)
+                        return
+                    case OnfidoFlowError.versionInsufficient:
+                        call.reject(errorMessage, "versionInsufficient", nil, nil)
+                        return
+                    case OnfidoFlowError.studioTaskError:
+                        call.reject(errorMessage, "studioTaskError", nil, nil)
+                        return
+                    case OnfidoFlowError.studioTaskAbandoned:
+                        call.reject(errorMessage, "studioTaskAbandoned", nil, nil)
+                        return
+                    default:
+                        call.reject(errorMessage, "unknown", nil, nil)
+                        return
+                    }
                 } else if case OnfidoResponse.success = response {
                     let result: [String: Any] = [
                         "status": "success",
@@ -41,7 +61,7 @@ public class SelfPayOnfidoPlugin: CAPPlugin, CAPBridgedPlugin {
                         "status": "error",
                         "message": "Flow was canceled by the user"
                     ]
-                    call.reject("User Canceled the flow")
+                    call.reject("User Canceled the flow","usercanceledflow", nil, nil)
                 }
              }
             
@@ -61,9 +81,10 @@ public class SelfPayOnfidoPlugin: CAPPlugin, CAPBridgedPlugin {
                     call.reject("Unable to access the main view controller.")
                     return
                 }
-                
+            
                 try onfidoFlow.run(from: customerViewController, presentationStyle: modalPresentationStyle)
-            } catch {
+            } catch let error {
+            
                 call.reject("Starting onfido flow failed")
             }
         }
