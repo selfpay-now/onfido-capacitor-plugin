@@ -56,24 +56,40 @@ class SelfPayOnfidoPlugin : Plugin() {
             }
 
             override fun onUserExited(exitCode: ExitCode) {
-                Log.d("OnfidoWorkflow", "onUserExited: $exitCode")
-
-                val error = JSObject()
-                error.put("status", "error")
-                error.put("code", "USEREXITED")
-                error.put("exitCode", exitCode.name) // Assuming `exitCode.name` gives a meaningful string
-
-                call.reject("User exited the flow", error)
+                call.reject("User Canceled the flow", "usercanceledflow")
             }
 
             override fun onException(exception: OnfidoWorkflow.WorkflowException) {
-                val error = JSObject()
-                error.put("status", "error")
-                error.put("code", "EXCEPTION")
-                error.put("message", exception.message)
-                call.reject("Onfido flow failed", error)
-                exception.printStackTrace()
-                Log.d("OnfidoWorkflow", "onException: ${exception.message}")
+                var code = "unknown"
+                when (exception) {
+                    is OnfidoWorkflow.WorkflowException.WorkflowInsufficientVersionException ->
+                        code = "versionInsufficient";
+                    is OnfidoWorkflow.WorkflowException.WorkflowInvalidSSLCertificateException ->
+                        code = "invalidSSLCertificate";
+                    is OnfidoWorkflow.WorkflowException.WorkflowTokenExpiredException ->
+                        code = "tokenExpired";
+                    is OnfidoWorkflow.WorkflowException.WorkflowCaptureCancelledException ->
+                        code = "workflowcanceled";
+                    is OnfidoWorkflow.WorkflowException.WorkflowUnknownCameraException ->
+                        code = "cameraPermission";
+                    is OnfidoWorkflow.WorkflowException.WorkflowUnknownResultException ->
+                        code = "workflowUnknown";
+                    is OnfidoWorkflow.WorkflowException.WorkflowUnsupportedTaskException ->
+                        code = "workflowUnsuported";
+                    is OnfidoWorkflow.WorkflowException.WorkflowHttpException ->
+                        code = "workflowhttpexception";
+                    is OnfidoWorkflow.WorkflowException.WorkflowUnknownException ->
+                        code = "workflowUnknown";
+                    is OnfidoWorkflow.WorkflowException.WorkflowAbandonedException ->
+                        code = "studioTaskAbandoned";
+                    is OnfidoWorkflow.WorkflowException.WorkflowBiometricTokenRetrievalException ->
+                        code = "tokenRetrievalFailed";
+                    is OnfidoWorkflow.WorkflowException.WorkflowBiometricTokenStorageException ->
+                        code = "biometricFailed";
+                    else -> code = "unknown"
+                }
+
+                call.reject("Onfido flow failed", code)
             }
         })
     }
