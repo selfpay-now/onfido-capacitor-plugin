@@ -16,5 +16,5 @@ Pod::Spec.new do |s|
   s.swift_version = '5.1'
   
   # Add CocoaPod dependencies here
-  s.dependency 'Onfido', '32.6.0' # Replace 'Onfido' with your desired CocoaPod
+  s.dependency 'Onfido', '32.6.1' # Replace 'Onfido' with your desired CocoaPod
 end
