@@ -7,25 +7,275 @@
     "methods": [
       {
         "name": "startworkflow",
-        "signature": "(options: { workflowRunId: string; token: string; }) => Promise<{ status: string; message: string; code?: string; }>",
+        "signature": "(options: StartWorkflowOptions) => Promise<StartWorkflowResult>",
         "parameters": [
           {
             "name": "options",
             "docs": "",
-            "type": "{ workflowRunId: string; token: string; }"
+            "type": "StartWorkflowOptions"
           }
         ],
-        "returns": "Promise<{ status: string; message: string; code?: string | undefined; }>",
+        "returns": "Promise<StartWorkflowResult>",
         "tags": [],
         "docs": "",
-        "complexTypes": [],
+        "complexTypes": [
+          "StartWorkflowResult",
+          "StartWorkflowOptions"
+        ],
         "slug": "startworkflow"
       }
     ],
     "properties": []
   },
-  "interfaces": [],
+  "interfaces": [
+    {
+      "name": "StartWorkflowResult",
+      "slug": "startworkflowresult",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "status",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "message",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "code",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "string | undefined"
+        }
+      ]
+    },
+    {
+      "name": "StartWorkflowOptions",
+      "slug": "startworkflowoptions",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "workflowRunId",
+          "tags": [],
+          "docs": "The Onfido workflow run ID.",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "token",
+          "tags": [],
+          "docs": "The Onfido SDK token issued for that workflow run.",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "language",
+          "tags": [],
+          "docs": "Language the KYC flow is rendered in, e.g. `ro` or `en_GB`.\n\nAndroid: applied via `WorkflowConfig.Builder.withLocale()`.\niOS: not applied yet — the Onfido Studio `WorkflowConfiguration` exposes no\nlocale setter, so the flow follows the device language.\n\nWhen omitted, the SDK falls back to the device language and then to `en_US`.",
+          "complexTypes": [
+            "OnfidoLanguage"
+          ],
+          "type": "OnfidoLanguage"
+        }
+      ]
+    }
+  ],
   "enums": [],
-  "typeAliases": [],
+  "typeAliases": [
+    {
+      "name": "OnfidoLanguage",
+      "slug": "onfidolanguage",
+      "docs": "Language codes supported by the Onfido/Entrust Smart Capture SDK.\nSee https://documentation.identity.entrust.com/sdk/sdk-customization",
+      "types": [
+        {
+          "text": "'ar'",
+          "complexTypes": []
+        },
+        {
+          "text": "'hy'",
+          "complexTypes": []
+        },
+        {
+          "text": "'bg'",
+          "complexTypes": []
+        },
+        {
+          "text": "'zh_CN'",
+          "complexTypes": []
+        },
+        {
+          "text": "'zh_TW'",
+          "complexTypes": []
+        },
+        {
+          "text": "'hr'",
+          "complexTypes": []
+        },
+        {
+          "text": "'cs'",
+          "complexTypes": []
+        },
+        {
+          "text": "'da'",
+          "complexTypes": []
+        },
+        {
+          "text": "'nl'",
+          "complexTypes": []
+        },
+        {
+          "text": "'en_GB'",
+          "complexTypes": []
+        },
+        {
+          "text": "'en_US'",
+          "complexTypes": []
+        },
+        {
+          "text": "'et'",
+          "complexTypes": []
+        },
+        {
+          "text": "'fi'",
+          "complexTypes": []
+        },
+        {
+          "text": "'fr'",
+          "complexTypes": []
+        },
+        {
+          "text": "'fr_CA'",
+          "complexTypes": []
+        },
+        {
+          "text": "'de'",
+          "complexTypes": []
+        },
+        {
+          "text": "'el'",
+          "complexTypes": []
+        },
+        {
+          "text": "'he'",
+          "complexTypes": []
+        },
+        {
+          "text": "'hi'",
+          "complexTypes": []
+        },
+        {
+          "text": "'hu'",
+          "complexTypes": []
+        },
+        {
+          "text": "'id'",
+          "complexTypes": []
+        },
+        {
+          "text": "'it'",
+          "complexTypes": []
+        },
+        {
+          "text": "'ja'",
+          "complexTypes": []
+        },
+        {
+          "text": "'ko'",
+          "complexTypes": []
+        },
+        {
+          "text": "'lv'",
+          "complexTypes": []
+        },
+        {
+          "text": "'lt'",
+          "complexTypes": []
+        },
+        {
+          "text": "'ms'",
+          "complexTypes": []
+        },
+        {
+          "text": "'nb'",
+          "complexTypes": []
+        },
+        {
+          "text": "'fa'",
+          "complexTypes": []
+        },
+        {
+          "text": "'pl'",
+          "complexTypes": []
+        },
+        {
+          "text": "'pt'",
+          "complexTypes": []
+        },
+        {
+          "text": "'pt_BR'",
+          "complexTypes": []
+        },
+        {
+          "text": "'ro'",
+          "complexTypes": []
+        },
+        {
+          "text": "'ru'",
+          "complexTypes": []
+        },
+        {
+          "text": "'sr_Latn'",
+          "complexTypes": []
+        },
+        {
+          "text": "'sk'",
+          "complexTypes": []
+        },
+        {
+          "text": "'sl'",
+          "complexTypes": []
+        },
+        {
+          "text": "'es'",
+          "complexTypes": []
+        },
+        {
+          "text": "'es_419'",
+          "complexTypes": []
+        },
+        {
+          "text": "'sv'",
+          "complexTypes": []
+        },
+        {
+          "text": "'th'",
+          "complexTypes": []
+        },
+        {
+          "text": "'tr'",
+          "complexTypes": []
+        },
+        {
+          "text": "'uk'",
+          "complexTypes": []
+        },
+        {
+          "text": "'vi'",
+          "complexTypes": []
+        }
+      ]
+    }
+  ],
   "pluginConfigs": []
 }

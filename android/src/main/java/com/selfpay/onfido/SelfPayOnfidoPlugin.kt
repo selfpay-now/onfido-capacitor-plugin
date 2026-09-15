@@ -12,6 +12,7 @@ import com.getcapacitor.annotation.CapacitorPlugin
 import com.onfido.android.sdk.capture.ExitCode
 import com.onfido.workflow.OnfidoWorkflow
 import com.onfido.workflow.WorkflowConfig
+import java.util.Locale
 
 
 @CapacitorPlugin(name = "SelfPayOnfido")
@@ -22,12 +23,24 @@ class SelfPayOnfidoPlugin : Plugin() {
     fun startworkflow(call: PluginCall) {
         val token = call.getString("token")
         val workflowRunId = call.getString("workflowRunId")
-        //todo: throw if any of the above 2 are null or empty
+        val language = call.getString("language")
+
+        if (token.isNullOrBlank() || workflowRunId.isNullOrBlank()) {
+            call.reject("Missing required parameters: 'token' or 'workflowRunId'", "missingparameters")
+            return
+        }
+
         try {
-            val workflowConfig = WorkflowConfig.Builder(
-                workflowRunId = workflowRunId!!,
-                sdkToken = token!!
-            ).build()
+            val builder = WorkflowConfig.Builder(
+                workflowRunId = workflowRunId,
+                sdkToken = token
+            )
+
+            // Leaving the locale unset makes the SDK follow the device language,
+            // falling back to en_US when that language is not supported.
+            toLocale(language)?.let { builder.withLocale(it) }
+
+            val workflowConfig = builder.build()
 
             val currentActivity = activity
             this.onfidoWorkflow = OnfidoWorkflow.create(currentActivity)
@@ -37,6 +50,24 @@ class SelfPayOnfidoPlugin : Plugin() {
             Log.e("OnfidoWorkflow", "Error starting workflow", e);
             call.reject("CustomPlugin: Could not initialize the Onfido Workflow")
         }
+    }
+
+    /**
+     * Onfido publishes its language codes with an underscore separator (`en_GB`, `pt_BR`,
+     * `zh_CN`, `sr_Latn`, `es_419`), while [Locale.forLanguageTag] expects BCP-47 tags with
+     * hyphens. Going through [Locale.forLanguageTag] rather than the [Locale] constructor is
+     * what makes the script (`sr_Latn`) and UN M.49 region (`es_419`) codes parse correctly.
+     */
+    private fun toLocale(language: String?): Locale? {
+        if (language.isNullOrBlank()) return null
+
+        val locale = Locale.forLanguageTag(language.trim().replace('_', '-'))
+        if (locale.language.isEmpty()) {
+            Log.w("OnfidoWorkflow", "Unrecognized language code '$language', falling back to the device language")
+            return null
+        }
+
+        return locale
     }
 
     @ActivityCallback

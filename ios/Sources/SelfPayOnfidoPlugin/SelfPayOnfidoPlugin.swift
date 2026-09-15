@@ -22,7 +22,16 @@ public class SelfPayOnfidoPlugin: CAPPlugin, CAPBridgedPlugin {
                       call.reject("Missing required parameters: 'sdkToken' or 'workflowRunId'")
                       return
                   }
-            
+
+            // The `language` option is accepted so the JS API is identical on both platforms,
+            // but Onfido Studio's `WorkflowConfiguration` exposes no locale setter (unlike
+            // Android's `WorkflowConfig.Builder.withLocale`). On iOS the flow therefore follows
+            // the device language, falling back to en_US.
+            // TODO: apply once the iOS SDK exposes a locale option for workflow runs.
+            if let language = call.getString("language") {
+                print("SelfPayOnfido: language '\(language)' ignored on iOS; the Onfido Studio flow uses the device language.")
+            }
+
             let responseHandler: (OnfidoResponse) -> Void = { [weak self] response in
                 var errorMessage = "An error occurred during the SDK flow."
                 if case let OnfidoResponse.error(error) = response {
