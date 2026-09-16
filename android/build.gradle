@@ -66,6 +66,8 @@ dependencies {
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
     implementation "com.onfido.sdk.capture:onfido-capture-sdk:23.10.0"
     implementation "com.onfido.sdk:onfido-workflow:23.10.0"
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'com.google.android.material:material:1.0.0'
     implementation 'androidx.multidex:multidex:2.0.1'
     testImplementation 'junit:junit:4.12'
 }
