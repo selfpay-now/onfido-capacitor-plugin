@@ -23,15 +23,6 @@ public class SelfPayOnfidoPlugin: CAPPlugin, CAPBridgedPlugin {
                       return
                   }
 
-            // The `language` option is accepted so the JS API is identical on both platforms,
-            // but Onfido Studio's `WorkflowConfiguration` exposes no locale setter (unlike
-            // Android's `WorkflowConfig.Builder.withLocale`). On iOS the flow therefore follows
-            // the device language, falling back to en_US.
-            // TODO: apply once the iOS SDK exposes a locale option for workflow runs.
-            if let language = call.getString("language") {
-                print("SelfPayOnfido: language '\(language)' ignored on iOS; the Onfido Studio flow uses the device language.")
-            }
-
             let responseHandler: (OnfidoResponse) -> Void = { [weak self] response in
                 var errorMessage = "An error occurred during the SDK flow."
                 if case let OnfidoResponse.error(error) = response {
@@ -74,10 +65,26 @@ public class SelfPayOnfidoPlugin: CAPPlugin, CAPBridgedPlugin {
                 }
              }
             
-            let onfidoFlow = OnfidoFlow(workflowConfiguration: .init(
+            let workflowConfiguration = WorkflowConfiguration(
                 workflowRunId: workflowRunId,
                 sdkToken: sdkToken
-            ))
+            )
+
+            // Onfido Studio exposes no `withLocale` on iOS, unlike Android's
+            // `WorkflowConfig.Builder.withLocale`, and its `languageCode` argument does not pick the
+            // language — the SDK resolves that from the bundle's preferred localizations, i.e. the
+            // device language. What it does honour is the *bundle* it reads strings from, so we hand
+            // it the SDK's own `<lang>.lproj` directly: every lookup then lands on that language
+            // with no resolution step involved.
+            if let language = call.getString("language"),
+               let localizationBundle = Self.onfidoLocalizationBundle(for: language) {
+                workflowConfiguration.withCustomLocalization(
+                    withTableName: "Localizable",
+                    in: localizationBundle
+                )
+            }
+
+            let onfidoFlow = OnfidoFlow(workflowConfiguration: workflowConfiguration)
                 .with(responseHandler: responseHandler)
             
             do {
@@ -97,5 +104,31 @@ public class SelfPayOnfidoPlugin: CAPPlugin, CAPBridgedPlugin {
                 call.reject("Starting onfido flow failed")
             }
         }
+    }
+
+    /// Onfido publishes one set of language codes (`en_GB`, `zh_CN`, `nb`) but ships the iOS
+    /// translations under BCP-47 `.lproj` names (`en-GB`, `zh-Hans`, `no`), so the two only line up
+    /// after an underscore swap plus these four renames.
+    private static let languageCodeOverrides = [
+        "en_US": "en",
+        "nb": "no",
+        "zh_CN": "zh-Hans",
+        "zh_TW": "zh-Hant"
+    ]
+
+    /// Returns the SDK's own `<code>.lproj` as a bundle, or `nil` to leave the flow on the device
+    /// language. `Bundle(for: OnfidoFlow.self)` must resolve to Onfido.framework — if the SDK is
+    /// ever linked statically it becomes the app bundle, no `.lproj` is found, and every flow
+    /// silently falls back to the device language.
+    private static func onfidoLocalizationBundle(for language: String) -> Bundle? {
+        let trimmed = language.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return nil }
+
+        let code = languageCodeOverrides[trimmed] ?? trimmed.replacingOccurrences(of: "_", with: "-")
+        guard let lprojPath = Bundle(for: OnfidoFlow.self).path(forResource: code, ofType: "lproj") else {
+            return nil
+        }
+
+        return Bundle(path: lprojPath)
     }
 }

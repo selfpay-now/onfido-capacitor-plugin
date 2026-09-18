@@ -16,10 +16,12 @@ export interface StartWorkflowOptions {
      * Language the KYC flow is rendered in, e.g. `ro` or `en_GB`.
      *
      * Android: applied via `WorkflowConfig.Builder.withLocale()`.
-     * iOS: not applied yet — the Onfido Studio `WorkflowConfiguration` exposes no
-     * locale setter, so the flow follows the device language.
+     * iOS: Onfido Studio exposes no `withLocale`, and `withCustomLocalization`'s `languageCode`
+     * does not select a language either — the SDK resolves that from the device. So the plugin
+     * passes the SDK's own `<lang>.lproj` as the localization bundle, which makes every string
+     * lookup land on that language directly.
      *
-     * When omitted, the SDK falls back to the device language and then to `en_US`.
+     * When omitted, or when the code has no `.lproj` in the SDK, the flow uses the device language.
      */
     language?: OnfidoLanguage;
 }
