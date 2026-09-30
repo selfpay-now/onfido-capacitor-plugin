@@ -26,7 +26,7 @@ public class SelfPayOnfidoPlugin: CAPPlugin, CAPBridgedPlugin {
             let responseHandler: (OnfidoResponse) -> Void = { [weak self] response in
                 var errorMessage = "An error occurred during the SDK flow."
                 if case let OnfidoResponse.error(error) = response {
-                    
+
                     switch error {
                     case OnfidoFlowError.microphonePermission:
                         call.reject(errorMessage, "microphonePermission", nil, nil)
@@ -64,7 +64,7 @@ public class SelfPayOnfidoPlugin: CAPPlugin, CAPBridgedPlugin {
                     call.reject("User Canceled the flow","usercanceledflow", nil, nil)
                 }
              }
-            
+
             let workflowConfiguration = WorkflowConfiguration(
                 workflowRunId: workflowRunId,
                 sdkToken: sdkToken
@@ -86,10 +86,10 @@ public class SelfPayOnfidoPlugin: CAPPlugin, CAPBridgedPlugin {
 
             let onfidoFlow = OnfidoFlow(workflowConfiguration: workflowConfiguration)
                 .with(responseHandler: responseHandler)
-            
+
             do {
                 var modalPresentationStyle: UIModalPresentationStyle = .fullScreen
-                
+
                 if UIDevice.current.userInterfaceIdiom == .pad {
                     modalPresentationStyle = .formSheet // to present modally on iPads
                 }
@@ -97,10 +97,10 @@ public class SelfPayOnfidoPlugin: CAPPlugin, CAPBridgedPlugin {
                     call.reject("Unable to access the main view controller.")
                     return
                 }
-            
+
                 try onfidoFlow.run(from: customerViewController, presentationStyle: modalPresentationStyle)
             } catch let error {
-            
+
                 call.reject("Starting onfido flow failed")
             }
         }

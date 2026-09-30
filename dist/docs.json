@@ -82,7 +82,7 @@
         {
           "name": "language",
           "tags": [],
-          "docs": "Language the KYC flow is rendered in, e.g. `ro` or `en_GB`.\n\nAndroid: applied via `WorkflowConfig.Builder.withLocale()`.\niOS: Onfido Studio exposes no `withLocale`, and `withCustomLocalization`'s `languageCode`\ndoes not select a language either — the SDK resolves that from the device. So the plugin\npasses the SDK's own `<lang>.lproj` as the localization bundle, which makes every string\nlookup land on that language directly.\n\nWhen omitted, or when the code has no `.lproj` in the SDK, the flow uses the device language.",
+          "docs": "Language the KYC flow is rendered in, e.g. `ro` or `en_GB`.\r\n\r\nAndroid: applied via `WorkflowConfig.Builder.withLocale()`.\r\niOS: Onfido Studio exposes no `withLocale`, and `withCustomLocalization`'s `languageCode`\r\ndoes not select a language either — the SDK resolves that from the device. So the plugin\r\npasses the SDK's own `<lang>.lproj` as the localization bundle, which makes every string\r\nlookup land on that language directly.\r\n\r\nWhen omitted, or when the code has no `.lproj` in the SDK, the flow uses the device language.",
           "complexTypes": [
             "OnfidoLanguage"
           ],
@@ -96,7 +96,7 @@
     {
       "name": "OnfidoLanguage",
       "slug": "onfidolanguage",
-      "docs": "Language codes supported by the Onfido/Entrust Smart Capture SDK.\nSee https://documentation.identity.entrust.com/sdk/sdk-customization",
+      "docs": "Language codes supported by the Onfido/Entrust Smart Capture SDK.\r\nSee https://documentation.identity.entrust.com/sdk/sdk-customization",
       "types": [
         {
           "text": "'ar'",
