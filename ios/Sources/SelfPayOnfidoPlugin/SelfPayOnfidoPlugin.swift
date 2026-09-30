@@ -77,7 +77,7 @@ public class SelfPayOnfidoPlugin: CAPPlugin, CAPBridgedPlugin {
             // it the SDK's own `<lang>.lproj` directly: every lookup then lands on that language
             // with no resolution step involved.
             if let language = call.getString("language"),
-               let localizationBundle = Self.onfidoLocalizationBundle(for: language) {
+               let localizationBundle = Self.getOnfidoLocalizationBundle(for: language) {
                 workflowConfiguration.withCustomLocalization(
                     withTableName: "Localizable",
                     in: localizationBundle
@@ -106,9 +106,9 @@ public class SelfPayOnfidoPlugin: CAPPlugin, CAPBridgedPlugin {
         }
     }
 
-    /// Onfido publishes one set of language codes (`en_GB`, `zh_CN`, `nb`) but ships the iOS
-    /// translations under BCP-47 `.lproj` names (`en-GB`, `zh-Hans`, `no`), 
-    /// so we need to override the codes for those languages.
+    /// Onfido publishes one set of language codes (`en_GB`, `zh_CN`, `nb`) but ships the iOS translations under BCP-47 `.lproj` names (`en-GB`, `zh-Hans`, `no`)
+    /// Therefore, we need to override the codes for those languages that doesn't have equivalent `.lproj` files. 
+    /// e.g. `en_US` is not shipped, but `en.lproj` is, so we override it to `en`.
     /// See: https://documentation.identity.entrust.com/sdk/sdk-customization
     /// See: https://github.com/onfido/onfido-ios-sdk/tree/master/localization
     private static let languageCodeOverrides = [
@@ -122,11 +122,11 @@ public class SelfPayOnfidoPlugin: CAPPlugin, CAPBridgedPlugin {
     /// language. `Bundle(for: OnfidoFlow.self)` must resolve to Onfido.framework — if the SDK is
     /// ever linked statically it becomes the app bundle, no `.lproj` is found, and every flow
     /// silently falls back to the device language.
-    private static func onfidoLocalizationBundle(for language: String) -> Bundle? {
-        let trimmed = language.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else { return nil }
+    private static func getOnfidoLocalizationBundle(for language: String) -> Bundle? {
+        let trimmedLanguage = language.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedLanguage.isEmpty else { return nil }
 
-        let code = languageCodeOverrides[trimmed] ?? trimmed.replacingOccurrences(of: "_", with: "-")
+        let code = languageCodeOverrides[trimmedLanguage] ?? trimmedLanguage.replacingOccurrences(of: "_", with: "-")
         guard let lprojPath = Bundle(for: OnfidoFlow.self).path(forResource: code, ofType: "lproj") else {
             return nil
         }
