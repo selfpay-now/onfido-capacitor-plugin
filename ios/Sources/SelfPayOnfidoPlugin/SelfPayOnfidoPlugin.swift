@@ -109,7 +109,7 @@ public class SelfPayOnfidoPlugin: CAPPlugin, CAPBridgedPlugin {
     /// Onfido publishes one set of language codes (`en_GB`, `zh_CN`, `nb`) but ships the iOS translations under BCP-47 `.lproj` names (`en-GB`, `zh-Hans`, `no`)
     /// Therefore, we need to override the codes for those languages that doesn't have equivalent `.lproj` files. 
     /// e.g. `en_US` is not shipped, but `en.lproj` is, so we override it to `en`.
-    /// See: https://documentation.identity.entrust.com/sdk/sdk-customization
+    /// See: https://documentation.identity.entrust.com/sdk/sdk-customization/#language-customization
     /// See: https://github.com/onfido/onfido-ios-sdk/tree/master/localization
     private static let languageCodeOverrides = [
         "en_US": "en",

@@ -57,17 +57,14 @@ class SelfPayOnfidoPlugin : Plugin() {
      * `zh_CN`, `sr_Latn`, `es_419`), while [Locale.forLanguageTag] expects BCP-47 tags with
      * hyphens. Going through [Locale.forLanguageTag] rather than the [Locale] constructor is
      * what makes the script (`sr_Latn`) and UN M.49 region (`es_419`) codes parse correctly.
+     * See: https://documentation.identity.entrust.com/sdk/sdk-customization/#language-customization
+     * See: https://developer.android.com/reference/java/util/Locale#forLanguageTag(java.lang.String)
      */
     private fun toLocale(language: String?): Locale? {
         if (language.isNullOrBlank()) return null
 
         val locale = Locale.forLanguageTag(language.trim().replace('_', '-'))
-        if (locale.language.isEmpty()) {
-            Log.w("OnfidoWorkflow", "Unrecognized language code '$language', falling back to the device language")
-            return null
-        }
-
-        return locale
+        return if (locale.language.isEmpty()) null else locale
     }
 
     @ActivityCallback
