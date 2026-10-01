@@ -66,9 +66,9 @@ export interface StartWorkflowOptions {
    * passes the SDK's own `<lang>.lproj` as the localization bundle, which makes every string
    * lookup land on that language directly.
    *
-   * When omitted, or when the code has no `.lproj` in the SDK, the flow uses the device language.
+   * When the code has no `.lproj` in the SDK, the flow uses the device language.
    */
-  language?: OnfidoLanguage;
+  language: OnfidoLanguage;
 }
 
 export interface StartWorkflowResult {

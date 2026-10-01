@@ -18,10 +18,22 @@ public class SelfPayOnfidoPlugin: CAPPlugin, CAPBridgedPlugin {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             guard let sdkToken = call.getString("token"),
-                        let workflowRunId = call.getString("workflowRunId") else {
-                      call.reject("Missing required parameters: 'sdkToken' or 'workflowRunId'")
-                      return
-                  }
+                  !sdkToken.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+                call.reject("Missing required parameter: 'token'", "missingparameters")
+                return
+            }
+
+            guard let workflowRunId = call.getString("workflowRunId"),
+                  !workflowRunId.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+                call.reject("Missing required parameter: 'workflowRunId'", "missingparameters")
+                return
+            }
+
+            guard let language = call.getString("language"),
+                  !language.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+                call.reject("Missing required parameter: 'language'", "missingparameters")
+                return
+            }
 
             let responseHandler: (OnfidoResponse) -> Void = { [weak self] response in
                 var errorMessage = "An error occurred during the SDK flow."
@@ -76,8 +88,7 @@ public class SelfPayOnfidoPlugin: CAPPlugin, CAPBridgedPlugin {
             // device language. What it does honour is the *bundle* it reads strings from, so we hand
             // it the SDK's own `<lang>.lproj` directly: every lookup then lands on that language
             // with no resolution step involved.
-            if let language = call.getString("language"),
-               let localizationBundle = Self.getOnfidoLocalizationBundle(for: language) {
+            if let localizationBundle = Self.getOnfidoLocalizationBundle(for: language) {
                 workflowConfiguration.withCustomLocalization(
                     withTableName: "Localizable",
                     in: localizationBundle
@@ -124,8 +135,6 @@ public class SelfPayOnfidoPlugin: CAPPlugin, CAPBridgedPlugin {
     /// silently falls back to the device language.
     private static func getOnfidoLocalizationBundle(for language: String) -> Bundle? {
         let trimmedLanguage = language.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmedLanguage.isEmpty else { return nil }
-
         let code = languageCodeOverrides[trimmedLanguage] ?? trimmedLanguage.replacingOccurrences(of: "_", with: "-")
         guard let lprojPath = Bundle(for: OnfidoFlow.self).path(forResource: code, ofType: "lproj") else {
             return nil

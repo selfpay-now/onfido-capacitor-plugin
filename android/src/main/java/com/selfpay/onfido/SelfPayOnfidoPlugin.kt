@@ -25,8 +25,18 @@ class SelfPayOnfidoPlugin : Plugin() {
         val workflowRunId = call.getString("workflowRunId")
         val language = call.getString("language")
 
-        if (token.isNullOrBlank() || workflowRunId.isNullOrBlank()) {
-            call.reject("Missing required parameters: 'token' or 'workflowRunId'", "missingparameters")
+        if (token.isNullOrBlank()) {
+            call.reject("Missing required parameter: 'token'", "missingparameters")
+            return
+        }
+
+        if (workflowRunId.isNullOrBlank()) {
+            call.reject("Missing required parameter: 'workflowRunId'", "missingparameters")
+            return
+        }
+
+        if (language.isNullOrBlank()) {
+            call.reject("Missing required parameter: 'language'", "missingparameters")
             return
         }
 
@@ -36,8 +46,8 @@ class SelfPayOnfidoPlugin : Plugin() {
                 sdkToken = token
             )
 
-            // Leaving the locale unset makes the SDK follow the device language,
-            // falling back to en_US when that language is not supported.
+            // An unrecognized code leaves the locale unset, which makes the SDK follow the device
+            // language, falling back to en_US when that language is not supported.
             toLocale(language)?.let { builder.withLocale(it) }
 
             val workflowConfig = builder.build()
@@ -60,9 +70,7 @@ class SelfPayOnfidoPlugin : Plugin() {
      * See: https://documentation.identity.entrust.com/sdk/sdk-customization/#language-customization
      * See: https://developer.android.com/reference/java/util/Locale#forLanguageTag(java.lang.String)
      */
-    private fun toLocale(language: String?): Locale? {
-        if (language.isNullOrBlank()) return null
-
+    private fun toLocale(language: String): Locale? {
         val locale = Locale.forLanguageTag(language.trim().replace('_', '-'))
         return if (locale.language.isEmpty()) null else locale
     }
