@@ -82,7 +82,7 @@
         {
           "name": "language",
           "tags": [],
-          "docs": "Language the KYC flow is rendered in, e.g. `ro` or `en_GB`.\r\n\r\nAndroid: applied via `WorkflowConfig.Builder.withLocale()`.\r\niOS: Onfido Studio exposes no `withLocale`, and `withCustomLocalization`'s `languageCode`\r\ndoes not select a language either — the SDK resolves that from the device. So the plugin\r\npasses the SDK's own `<lang>.lproj` as the localization bundle, which makes every string\r\nlookup land on that language directly.\r\n\r\nWhen the code has no `.lproj` in the SDK, the flow uses the device language.",
+          "docs": "The Onfido language code the workflow is displayed in, e.g. `ro` or `en_GB`.",
           "complexTypes": [
             "OnfidoLanguage"
           ],
