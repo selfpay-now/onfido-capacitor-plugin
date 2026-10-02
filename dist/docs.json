@@ -7,25 +7,362 @@
     "methods": [
       {
         "name": "startworkflow",
-        "signature": "(options: { workflowRunId: string; token: string; }) => Promise<{ status: string; message: string; code?: string; }>",
+        "signature": "(options: StartWorkflowOptions) => Promise<StartWorkflowResult>",
         "parameters": [
           {
             "name": "options",
             "docs": "",
-            "type": "{ workflowRunId: string; token: string; }"
+            "type": "StartWorkflowOptions"
           }
         ],
-        "returns": "Promise<{ status: string; message: string; code?: string | undefined; }>",
+        "returns": "Promise<StartWorkflowResult>",
         "tags": [],
         "docs": "",
-        "complexTypes": [],
+        "complexTypes": [
+          "StartWorkflowResult",
+          "StartWorkflowOptions"
+        ],
         "slug": "startworkflow"
       }
     ],
     "properties": []
   },
-  "interfaces": [],
-  "enums": [],
+  "interfaces": [
+    {
+      "name": "StartWorkflowResult",
+      "slug": "startworkflowresult",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "status",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "message",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "code",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "string | undefined"
+        }
+      ]
+    },
+    {
+      "name": "StartWorkflowOptions",
+      "slug": "startworkflowoptions",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "workflowRunId",
+          "tags": [],
+          "docs": "The Onfido workflow run ID.",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "token",
+          "tags": [],
+          "docs": "The Onfido SDK token issued for that workflow run.",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "language",
+          "tags": [],
+          "docs": "The language the workflow is displayed in, e.g. `OnfidoLanguage.ro`.",
+          "complexTypes": [
+            "OnfidoLanguage"
+          ],
+          "type": "OnfidoLanguage"
+        }
+      ]
+    }
+  ],
+  "enums": [
+    {
+      "name": "OnfidoLanguage",
+      "slug": "onfidolanguage",
+      "members": [
+        {
+          "name": "ar",
+          "value": "'ar'",
+          "tags": [],
+          "docs": ""
+        },
+        {
+          "name": "hy",
+          "value": "'hy'",
+          "tags": [],
+          "docs": ""
+        },
+        {
+          "name": "bg",
+          "value": "'bg'",
+          "tags": [],
+          "docs": ""
+        },
+        {
+          "name": "zh_CN",
+          "value": "'zh_CN'",
+          "tags": [],
+          "docs": ""
+        },
+        {
+          "name": "zh_TW",
+          "value": "'zh_TW'",
+          "tags": [],
+          "docs": ""
+        },
+        {
+          "name": "hr",
+          "value": "'hr'",
+          "tags": [],
+          "docs": ""
+        },
+        {
+          "name": "cs",
+          "value": "'cs'",
+          "tags": [],
+          "docs": ""
+        },
+        {
+          "name": "da",
+          "value": "'da'",
+          "tags": [],
+          "docs": ""
+        },
+        {
+          "name": "nl",
+          "value": "'nl'",
+          "tags": [],
+          "docs": ""
+        },
+        {
+          "name": "en_GB",
+          "value": "'en_GB'",
+          "tags": [],
+          "docs": ""
+        },
+        {
+          "name": "en_US",
+          "value": "'en_US'",
+          "tags": [],
+          "docs": ""
+        },
+        {
+          "name": "et",
+          "value": "'et'",
+          "tags": [],
+          "docs": ""
+        },
+        {
+          "name": "fi",
+          "value": "'fi'",
+          "tags": [],
+          "docs": ""
+        },
+        {
+          "name": "fr",
+          "value": "'fr'",
+          "tags": [],
+          "docs": ""
+        },
+        {
+          "name": "fr_CA",
+          "value": "'fr_CA'",
+          "tags": [],
+          "docs": ""
+        },
+        {
+          "name": "de",
+          "value": "'de'",
+          "tags": [],
+          "docs": ""
+        },
+        {
+          "name": "el",
+          "value": "'el'",
+          "tags": [],
+          "docs": ""
+        },
+        {
+          "name": "he",
+          "value": "'he'",
+          "tags": [],
+          "docs": ""
+        },
+        {
+          "name": "hi",
+          "value": "'hi'",
+          "tags": [],
+          "docs": ""
+        },
+        {
+          "name": "hu",
+          "value": "'hu'",
+          "tags": [],
+          "docs": ""
+        },
+        {
+          "name": "id",
+          "value": "'id'",
+          "tags": [],
+          "docs": ""
+        },
+        {
+          "name": "it",
+          "value": "'it'",
+          "tags": [],
+          "docs": ""
+        },
+        {
+          "name": "ja",
+          "value": "'ja'",
+          "tags": [],
+          "docs": ""
+        },
+        {
+          "name": "ko",
+          "value": "'ko'",
+          "tags": [],
+          "docs": ""
+        },
+        {
+          "name": "lv",
+          "value": "'lv'",
+          "tags": [],
+          "docs": ""
+        },
+        {
+          "name": "lt",
+          "value": "'lt'",
+          "tags": [],
+          "docs": ""
+        },
+        {
+          "name": "ms",
+          "value": "'ms'",
+          "tags": [],
+          "docs": ""
+        },
+        {
+          "name": "nb",
+          "value": "'nb'",
+          "tags": [],
+          "docs": ""
+        },
+        {
+          "name": "fa",
+          "value": "'fa'",
+          "tags": [],
+          "docs": ""
+        },
+        {
+          "name": "pl",
+          "value": "'pl'",
+          "tags": [],
+          "docs": ""
+        },
+        {
+          "name": "pt",
+          "value": "'pt'",
+          "tags": [],
+          "docs": ""
+        },
+        {
+          "name": "pt_BR",
+          "value": "'pt_BR'",
+          "tags": [],
+          "docs": ""
+        },
+        {
+          "name": "ro",
+          "value": "'ro'",
+          "tags": [],
+          "docs": ""
+        },
+        {
+          "name": "ru",
+          "value": "'ru'",
+          "tags": [],
+          "docs": ""
+        },
+        {
+          "name": "sr_Latn",
+          "value": "'sr_Latn'",
+          "tags": [],
+          "docs": ""
+        },
+        {
+          "name": "sk",
+          "value": "'sk'",
+          "tags": [],
+          "docs": ""
+        },
+        {
+          "name": "sl",
+          "value": "'sl'",
+          "tags": [],
+          "docs": ""
+        },
+        {
+          "name": "es",
+          "value": "'es'",
+          "tags": [],
+          "docs": ""
+        },
+        {
+          "name": "es_419",
+          "value": "'es_419'",
+          "tags": [],
+          "docs": ""
+        },
+        {
+          "name": "sv",
+          "value": "'sv'",
+          "tags": [],
+          "docs": ""
+        },
+        {
+          "name": "th",
+          "value": "'th'",
+          "tags": [],
+          "docs": ""
+        },
+        {
+          "name": "tr",
+          "value": "'tr'",
+          "tags": [],
+          "docs": ""
+        },
+        {
+          "name": "uk",
+          "value": "'uk'",
+          "tags": [],
+          "docs": ""
+        },
+        {
+          "name": "vi",
+          "value": "'vi'",
+          "tags": [],
+          "docs": ""
+        }
+      ]
+    }
+  ],
   "typeAliases": [],
   "pluginConfigs": []
 }
