@@ -82,7 +82,7 @@
         {
           "name": "language",
           "tags": [],
-          "docs": "The Onfido language code the workflow is displayed in, e.g. `ro` or `en_GB`.",
+          "docs": "The language the workflow is displayed in, e.g. `OnfidoLanguage.ro`.",
           "complexTypes": [
             "OnfidoLanguage"
           ],
@@ -91,191 +91,278 @@
       ]
     }
   ],
-  "enums": [],
-  "typeAliases": [
+  "enums": [
     {
       "name": "OnfidoLanguage",
       "slug": "onfidolanguage",
-      "docs": "Language codes supported by the Onfido/Entrust Smart Capture SDK.\r\nSee https://documentation.identity.entrust.com/sdk/sdk-customization",
-      "types": [
+      "members": [
         {
-          "text": "'ar'",
-          "complexTypes": []
+          "name": "ar",
+          "value": "'ar'",
+          "tags": [],
+          "docs": ""
         },
         {
-          "text": "'hy'",
-          "complexTypes": []
+          "name": "hy",
+          "value": "'hy'",
+          "tags": [],
+          "docs": ""
         },
         {
-          "text": "'bg'",
-          "complexTypes": []
+          "name": "bg",
+          "value": "'bg'",
+          "tags": [],
+          "docs": ""
         },
         {
-          "text": "'zh_CN'",
-          "complexTypes": []
+          "name": "zh_CN",
+          "value": "'zh_CN'",
+          "tags": [],
+          "docs": ""
         },
         {
-          "text": "'zh_TW'",
-          "complexTypes": []
+          "name": "zh_TW",
+          "value": "'zh_TW'",
+          "tags": [],
+          "docs": ""
         },
         {
-          "text": "'hr'",
-          "complexTypes": []
+          "name": "hr",
+          "value": "'hr'",
+          "tags": [],
+          "docs": ""
         },
         {
-          "text": "'cs'",
-          "complexTypes": []
+          "name": "cs",
+          "value": "'cs'",
+          "tags": [],
+          "docs": ""
         },
         {
-          "text": "'da'",
-          "complexTypes": []
+          "name": "da",
+          "value": "'da'",
+          "tags": [],
+          "docs": ""
         },
         {
-          "text": "'nl'",
-          "complexTypes": []
+          "name": "nl",
+          "value": "'nl'",
+          "tags": [],
+          "docs": ""
         },
         {
-          "text": "'en_GB'",
-          "complexTypes": []
+          "name": "en_GB",
+          "value": "'en_GB'",
+          "tags": [],
+          "docs": ""
         },
         {
-          "text": "'en_US'",
-          "complexTypes": []
+          "name": "en_US",
+          "value": "'en_US'",
+          "tags": [],
+          "docs": ""
         },
         {
-          "text": "'et'",
-          "complexTypes": []
+          "name": "et",
+          "value": "'et'",
+          "tags": [],
+          "docs": ""
         },
         {
-          "text": "'fi'",
-          "complexTypes": []
+          "name": "fi",
+          "value": "'fi'",
+          "tags": [],
+          "docs": ""
         },
         {
-          "text": "'fr'",
-          "complexTypes": []
+          "name": "fr",
+          "value": "'fr'",
+          "tags": [],
+          "docs": ""
         },
         {
-          "text": "'fr_CA'",
-          "complexTypes": []
+          "name": "fr_CA",
+          "value": "'fr_CA'",
+          "tags": [],
+          "docs": ""
         },
         {
-          "text": "'de'",
-          "complexTypes": []
+          "name": "de",
+          "value": "'de'",
+          "tags": [],
+          "docs": ""
         },
         {
-          "text": "'el'",
-          "complexTypes": []
+          "name": "el",
+          "value": "'el'",
+          "tags": [],
+          "docs": ""
         },
         {
-          "text": "'he'",
-          "complexTypes": []
+          "name": "he",
+          "value": "'he'",
+          "tags": [],
+          "docs": ""
         },
         {
-          "text": "'hi'",
-          "complexTypes": []
+          "name": "hi",
+          "value": "'hi'",
+          "tags": [],
+          "docs": ""
         },
         {
-          "text": "'hu'",
-          "complexTypes": []
+          "name": "hu",
+          "value": "'hu'",
+          "tags": [],
+          "docs": ""
         },
         {
-          "text": "'id'",
-          "complexTypes": []
+          "name": "id",
+          "value": "'id'",
+          "tags": [],
+          "docs": ""
         },
         {
-          "text": "'it'",
-          "complexTypes": []
+          "name": "it",
+          "value": "'it'",
+          "tags": [],
+          "docs": ""
         },
         {
-          "text": "'ja'",
-          "complexTypes": []
+          "name": "ja",
+          "value": "'ja'",
+          "tags": [],
+          "docs": ""
         },
         {
-          "text": "'ko'",
-          "complexTypes": []
+          "name": "ko",
+          "value": "'ko'",
+          "tags": [],
+          "docs": ""
         },
         {
-          "text": "'lv'",
-          "complexTypes": []
+          "name": "lv",
+          "value": "'lv'",
+          "tags": [],
+          "docs": ""
         },
         {
-          "text": "'lt'",
-          "complexTypes": []
+          "name": "lt",
+          "value": "'lt'",
+          "tags": [],
+          "docs": ""
         },
         {
-          "text": "'ms'",
-          "complexTypes": []
+          "name": "ms",
+          "value": "'ms'",
+          "tags": [],
+          "docs": ""
         },
         {
-          "text": "'nb'",
-          "complexTypes": []
+          "name": "nb",
+          "value": "'nb'",
+          "tags": [],
+          "docs": ""
         },
         {
-          "text": "'fa'",
-          "complexTypes": []
+          "name": "fa",
+          "value": "'fa'",
+          "tags": [],
+          "docs": ""
         },
         {
-          "text": "'pl'",
-          "complexTypes": []
+          "name": "pl",
+          "value": "'pl'",
+          "tags": [],
+          "docs": ""
         },
         {
-          "text": "'pt'",
-          "complexTypes": []
+          "name": "pt",
+          "value": "'pt'",
+          "tags": [],
+          "docs": ""
         },
         {
-          "text": "'pt_BR'",
-          "complexTypes": []
+          "name": "pt_BR",
+          "value": "'pt_BR'",
+          "tags": [],
+          "docs": ""
         },
         {
-          "text": "'ro'",
-          "complexTypes": []
+          "name": "ro",
+          "value": "'ro'",
+          "tags": [],
+          "docs": ""
         },
         {
-          "text": "'ru'",
-          "complexTypes": []
+          "name": "ru",
+          "value": "'ru'",
+          "tags": [],
+          "docs": ""
         },
         {
-          "text": "'sr_Latn'",
-          "complexTypes": []
+          "name": "sr_Latn",
+          "value": "'sr_Latn'",
+          "tags": [],
+          "docs": ""
         },
         {
-          "text": "'sk'",
-          "complexTypes": []
+          "name": "sk",
+          "value": "'sk'",
+          "tags": [],
+          "docs": ""
         },
         {
-          "text": "'sl'",
-          "complexTypes": []
+          "name": "sl",
+          "value": "'sl'",
+          "tags": [],
+          "docs": ""
         },
         {
-          "text": "'es'",
-          "complexTypes": []
+          "name": "es",
+          "value": "'es'",
+          "tags": [],
+          "docs": ""
         },
         {
-          "text": "'es_419'",
-          "complexTypes": []
+          "name": "es_419",
+          "value": "'es_419'",
+          "tags": [],
+          "docs": ""
         },
         {
-          "text": "'sv'",
-          "complexTypes": []
+          "name": "sv",
+          "value": "'sv'",
+          "tags": [],
+          "docs": ""
         },
         {
-          "text": "'th'",
-          "complexTypes": []
+          "name": "th",
+          "value": "'th'",
+          "tags": [],
+          "docs": ""
         },
         {
-          "text": "'tr'",
-          "complexTypes": []
+          "name": "tr",
+          "value": "'tr'",
+          "tags": [],
+          "docs": ""
         },
         {
-          "text": "'uk'",
-          "complexTypes": []
+          "name": "uk",
+          "value": "'uk'",
+          "tags": [],
+          "docs": ""
         },
         {
-          "text": "'vi'",
-          "complexTypes": []
+          "name": "vi",
+          "value": "'vi'",
+          "tags": [],
+          "docs": ""
         }
       ]
     }
   ],
+  "typeAliases": [],
   "pluginConfigs": []
 }

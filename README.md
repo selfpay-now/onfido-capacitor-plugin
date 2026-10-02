@@ -15,7 +15,7 @@ npx cap sync
 
 * [`startworkflow(...)`](#startworkflow)
 * [Interfaces](#interfaces)
-* [Type Aliases](#type-aliases)
+* [Enums](#enums)
 
 </docgen-index>
 
@@ -51,21 +51,63 @@ startworkflow(options: StartWorkflowOptions) => Promise<StartWorkflowResult>
 
 #### StartWorkflowOptions
 
-| Prop                | Type                                                      | Description                                                                  |
-| ------------------- | --------------------------------------------------------- | ---------------------------------------------------------------------------- |
-| **`workflowRunId`** | <code>string</code>                                       | The Onfido workflow run ID.                                                  |
-| **`token`**         | <code>string</code>                                       | The Onfido SDK token issued for that workflow run.                           |
-| **`language`**      | <code><a href="#onfidolanguage">OnfidoLanguage</a></code> | The Onfido language code the workflow is displayed in, e.g. `ro` or `en_GB`. |
+| Prop                | Type                                                      | Description                                                                                        |
+| ------------------- | --------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| **`workflowRunId`** | <code>string</code>                                       | The Onfido workflow run ID.                                                                        |
+| **`token`**         | <code>string</code>                                       | The Onfido SDK token issued for that workflow run.                                                 |
+| **`language`**      | <code><a href="#onfidolanguage">OnfidoLanguage</a></code> | The language the workflow is displayed in, e.g. <a href="#onfidolanguage">`OnfidoLanguage.ro`</a>. |
 
 
-### Type Aliases
+### Enums
 
 
 #### OnfidoLanguage
 
-Language codes supported by the Onfido/Entrust Smart Capture SDK.
-See https://documentation.identity.entrust.com/sdk/sdk-customization
-
-<code>'ar' | 'hy' | 'bg' | 'zh_CN' | 'zh_TW' | 'hr' | 'cs' | 'da' | 'nl' | 'en_GB' | 'en_US' | 'et' | 'fi' | 'fr' | 'fr_CA' | 'de' | 'el' | 'he' | 'hi' | 'hu' | 'id' | 'it' | 'ja' | 'ko' | 'lv' | 'lt' | 'ms' | 'nb' | 'fa' | 'pl' | 'pt' | 'pt_BR' | 'ro' | 'ru' | 'sr_Latn' | 'sk' | 'sl' | 'es' | 'es_419' | 'sv' | 'th' | 'tr' | 'uk' | 'vi'</code>
+| Members       | Value                  |
+| ------------- | ---------------------- |
+| **`ar`**      | <code>'ar'</code>      |
+| **`hy`**      | <code>'hy'</code>      |
+| **`bg`**      | <code>'bg'</code>      |
+| **`zh_CN`**   | <code>'zh_CN'</code>   |
+| **`zh_TW`**   | <code>'zh_TW'</code>   |
+| **`hr`**      | <code>'hr'</code>      |
+| **`cs`**      | <code>'cs'</code>      |
+| **`da`**      | <code>'da'</code>      |
+| **`nl`**      | <code>'nl'</code>      |
+| **`en_GB`**   | <code>'en_GB'</code>   |
+| **`en_US`**   | <code>'en_US'</code>   |
+| **`et`**      | <code>'et'</code>      |
+| **`fi`**      | <code>'fi'</code>      |
+| **`fr`**      | <code>'fr'</code>      |
+| **`fr_CA`**   | <code>'fr_CA'</code>   |
+| **`de`**      | <code>'de'</code>      |
+| **`el`**      | <code>'el'</code>      |
+| **`he`**      | <code>'he'</code>      |
+| **`hi`**      | <code>'hi'</code>      |
+| **`hu`**      | <code>'hu'</code>      |
+| **`id`**      | <code>'id'</code>      |
+| **`it`**      | <code>'it'</code>      |
+| **`ja`**      | <code>'ja'</code>      |
+| **`ko`**      | <code>'ko'</code>      |
+| **`lv`**      | <code>'lv'</code>      |
+| **`lt`**      | <code>'lt'</code>      |
+| **`ms`**      | <code>'ms'</code>      |
+| **`nb`**      | <code>'nb'</code>      |
+| **`fa`**      | <code>'fa'</code>      |
+| **`pl`**      | <code>'pl'</code>      |
+| **`pt`**      | <code>'pt'</code>      |
+| **`pt_BR`**   | <code>'pt_BR'</code>   |
+| **`ro`**      | <code>'ro'</code>      |
+| **`ru`**      | <code>'ru'</code>      |
+| **`sr_Latn`** | <code>'sr_Latn'</code> |
+| **`sk`**      | <code>'sk'</code>      |
+| **`sl`**      | <code>'sl'</code>      |
+| **`es`**      | <code>'es'</code>      |
+| **`es_419`**  | <code>'es_419'</code>  |
+| **`sv`**      | <code>'sv'</code>      |
+| **`th`**      | <code>'th'</code>      |
+| **`tr`**      | <code>'tr'</code>      |
+| **`uk`**      | <code>'uk'</code>      |
+| **`vi`**      | <code>'vi'</code>      |
 
 </docgen-api>
