@@ -1,12 +1,9 @@
 import { WebPlugin } from '@capacitor/core';
 
-import type { SelfPayOnfidoPlugin } from './definitions';
+import type { SelfPayOnfidoPlugin, StartWorkflowOptions, StartWorkflowResult } from './definitions';
 
 export class SelfPayOnfidoWeb extends WebPlugin implements SelfPayOnfidoPlugin {
-  startworkflow(_: {
-    workflowRunId: string;
-    token: string;
-  }): Promise<{ status: string; message: string; code?: string }> {
+  startworkflow(_: StartWorkflowOptions): Promise<StartWorkflowResult> {
     throw new Error('Method not implemented.');
   }
 }
