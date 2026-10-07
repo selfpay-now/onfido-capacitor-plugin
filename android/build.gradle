@@ -7,7 +7,8 @@ ext {
 
 buildscript {
     ext {
-        kotlin_version = '2.1.0'
+        // Entrust IDV SDK 100.x is compiled with Kotlin 2.1.21
+        kotlin_version = '2.1.21'
     }
     repositories {
         google()
@@ -64,8 +65,18 @@ dependencies {
     testImplementation "junit:junit:$junitVersion"
     androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
-    implementation "com.onfido.sdk.capture:onfido-capture-sdk:23.10.0"
-    implementation "com.onfido.sdk:onfido-workflow:23.10.0"
+    // Entrust IDV SDK (successor of the Onfido Smart Capture SDK). Studio workflows resolve their
+    // tasks at runtime, so every task module the workflow may use has to be on the classpath;
+    // a missing one surfaces as ErrorType.ModuleLoadError.
+    def entrustIdvVersion = '100.16.0'
+    implementation "com.entrust.identity.verification.sdk:core:$entrustIdvVersion"
+    implementation "com.entrust.identity.verification.sdk:welcome:$entrustIdvVersion"
+    implementation "com.entrust.identity.verification.sdk:consent:$entrustIdvVersion"
+    implementation "com.entrust.identity.verification.sdk:document:$entrustIdvVersion"
+    implementation "com.entrust.identity.verification.sdk:nfc:$entrustIdvVersion"
+    implementation "com.entrust.identity.verification.sdk:face.photo:$entrustIdvVersion"
+    implementation "com.entrust.identity.verification.sdk:face.motion:$entrustIdvVersion"
+    implementation "com.entrust.identity.verification.sdk:retry:$entrustIdvVersion"
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'com.google.android.material:material:1.0.0'
     implementation 'androidx.multidex:multidex:2.0.1'

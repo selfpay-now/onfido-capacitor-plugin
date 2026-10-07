@@ -1,23 +1,43 @@
 package com.selfpay.onfido
 
-import android.content.Intent
 import android.util.Log
-import androidx.activity.result.ActivityResult
+import com.entrust.identity.verification.sdk.api.Configuration
+import com.entrust.identity.verification.sdk.api.EntrustIDV
+import com.entrust.identity.verification.sdk.api.Localisation
+import com.entrust.identity.verification.sdk.api.StudioParameters
+import com.entrust.identity.verification.sdk.api.callbacks.Callbacks
+import com.entrust.identity.verification.sdk.api.callbacks.Error
+import com.entrust.identity.verification.sdk.api.callbacks.ErrorType
+import com.entrust.identity.verification.sdk.api.callbacks.UserAction
+import com.entrust.identity.verification.sdk.api.theming.Theme
+import com.entrust.identity.verification.sdk.api.theming.ThemeMode
 import com.getcapacitor.JSObject
 import com.getcapacitor.Plugin
 import com.getcapacitor.PluginCall
 import com.getcapacitor.PluginMethod
-import com.getcapacitor.annotation.ActivityCallback
 import com.getcapacitor.annotation.CapacitorPlugin
-import com.onfido.android.sdk.capture.ExitCode
-import com.onfido.workflow.OnfidoWorkflow
-import com.onfido.workflow.WorkflowConfig
-import java.util.Locale
 
 
 @CapacitorPlugin(name = "SelfPayOnfido")
 class SelfPayOnfidoPlugin : Plugin() {
-    private final var onfidoWorkflow: OnfidoWorkflow? = null
+    private var entrustIdv: EntrustIDV? = null
+    private var pendingCall: PluginCall? = null
+
+    /**
+     * The ComponentActivity constructor registers an activity result launcher, which is only
+     * allowed before the activity is STARTED. Capacitor loads plugins from BridgeActivity.onCreate,
+     * so the instance is created here once instead of on every call.
+     */
+    override fun load() {
+        entrustIdv = EntrustIDV(
+            activity,
+            Callbacks(
+                onComplete = { _ -> onComplete() },
+                onError = { error -> onError(error) },
+                onUserExit = { userAction -> onUserExit(userAction) }
+            )
+        )
+    }
 
     @PluginMethod
     fun startworkflow(call: PluginCall) {
@@ -40,94 +60,105 @@ class SelfPayOnfidoPlugin : Plugin() {
             return
         }
 
-        try {
-            val builder = WorkflowConfig.Builder(
-                workflowRunId = workflowRunId,
-                sdkToken = token
-            )
-
-            // An unrecognized code leaves the locale unset, which makes the SDK follow the device
-            // language, falling back to en_US when that language is not supported.
-            toLocale(language)?.let { builder.withLocale(it) }
-
-            val workflowConfig = builder.build()
-
-            val currentActivity = activity
-            this.onfidoWorkflow = OnfidoWorkflow.create(currentActivity)
-            startActivityForResult(call, onfidoWorkflow!!.createIntent(workflowConfig), "onfidoFlowFinished");
+        val sdk = entrustIdv
+        if (sdk == null) {
+            call.reject("CustomPlugin: Could not initialize the Entrust IDV SDK")
+            return
         }
-        catch (e: Exception) {
-            Log.e("OnfidoWorkflow", "Error starting workflow", e);
-            call.reject("CustomPlugin: Could not initialize the Onfido Workflow")
+
+        try {
+            // The Studio SDK token is bound to the workflow run, so the run id is not passed to the SDK.
+            Log.d(TAG, "Starting workflow run $workflowRunId")
+            pendingCall = call
+            sdk.start(
+                StudioParameters(
+                    token,
+                    Configuration(
+                        // Mythril only ships a dark theme
+                        theme = Theme(mode = ThemeMode.Dark),
+                        localisation = Localisation(language = toLanguageTag(language))
+                    )
+                )
+            )
+        } catch (e: Exception) {
+            Log.e(TAG, "Error starting workflow", e)
+            pendingCall = null
+            call.reject("CustomPlugin: Could not initialize the Entrust IDV SDK")
         }
     }
 
     /**
-     * Onfido publishes its language codes with an underscore separator (`en_GB`, `pt_BR`,
-     * `zh_CN`, `sr_Latn`, `es_419`), while [Locale.forLanguageTag] expects BCP-47 tags with
-     * hyphens. Going through [Locale.forLanguageTag] rather than the [Locale] constructor is
-     * what makes the script (`sr_Latn`) and UN M.49 region (`es_419`) codes parse correctly.
-     * See: https://documentation.identity.entrust.com/sdk/sdk-customization/#language-customization
-     * See: https://developer.android.com/reference/java/util/Locale#forLanguageTag(java.lang.String)
+     * Mythril sends the Onfido language codes (`en_GB`, `pt_BR`), while the Entrust IDV SDK
+     * ships its translations under lowercase, hyphenated tags (`en-gb`, `pt-br`, `ro`).
      */
-    private fun toLocale(language: String): Locale? {
-        val locale = Locale.forLanguageTag(language.trim().replace('_', '-'))
-        return if (locale.language.isEmpty()) null else locale
+    private fun toLanguageTag(language: String): String = language.trim().replace('_', '-').lowercase()
+
+    private fun onComplete() {
+        Log.d(TAG, "Workflow completed successfully.")
+        val result = JSObject()
+        result.put("status", "success")
+        result.put("message", "Workflow completed successfully.")
+        takePendingCall()?.resolve(result)
     }
 
-    @ActivityCallback
-    private fun onfidoFlowFinished(call: PluginCall?, result: ActivityResult) {
-        if (call == null) {
-            return
+    private fun onError(error: Error) {
+        val type = error.type
+        Log.e(TAG, "Workflow failed: ${type.category}/${type.name} ${error.message ?: ""}")
+
+        val data = JSObject()
+        data.put("category", type.category.name)
+        data.put("name", type.name)
+        data.put("message", error.message)
+
+        takePendingCall()?.reject("Onfido flow failed", toErrorCode(type), data)
+    }
+
+    private fun onUserExit(userAction: UserAction) {
+        Log.d(TAG, "User exited: ${userAction.name}")
+        val code = when (userAction) {
+            UserAction.PermissionsDenied -> "cameraPermission"
+            UserAction.RequiredNfcNotCompleted -> "workflowcanceled"
+            else -> "usercanceledflow"
         }
 
-        onfidoWorkflow?.handleActivityResult(result.resultCode, result.data, object : OnfidoWorkflow.ResultListener {
-            override fun onUserCompleted() {
-                Log.d("OnfidoWorkflow", "Workflow completed successfully.")
-                val result = JSObject()
-                result.put("status", "success")
-                result.put("message", "Workflow completed successfully.")
+        val data = JSObject()
+        data.put("userAction", userAction.name)
 
-                call.resolve(result)
-            }
-
-            override fun onUserExited(exitCode: ExitCode) {
-                call.reject("User Canceled the flow", "usercanceledflow")
-            }
-
-            override fun onException(exception: OnfidoWorkflow.WorkflowException) {
-                var code = "unknown"
-                when (exception) {
-                    is OnfidoWorkflow.WorkflowException.WorkflowInsufficientVersionException ->
-                        code = "versionInsufficient";
-                    is OnfidoWorkflow.WorkflowException.WorkflowInvalidSSLCertificateException ->
-                        code = "invalidSSLCertificate";
-                    is OnfidoWorkflow.WorkflowException.WorkflowTokenExpiredException ->
-                        code = "tokenExpired";
-                    is OnfidoWorkflow.WorkflowException.WorkflowCaptureCancelledException ->
-                        code = "workflowcanceled";
-                    is OnfidoWorkflow.WorkflowException.WorkflowUnknownCameraException ->
-                        code = "cameraPermission";
-                    is OnfidoWorkflow.WorkflowException.WorkflowUnknownResultException ->
-                        code = "workflowUnknown";
-                    is OnfidoWorkflow.WorkflowException.WorkflowUnsupportedTaskException ->
-                        code = "workflowUnsuported";
-                    is OnfidoWorkflow.WorkflowException.WorkflowHttpException ->
-                        code = "workflowhttpexception";
-                    is OnfidoWorkflow.WorkflowException.WorkflowUnknownException ->
-                        code = "workflowUnknown";
-                    is OnfidoWorkflow.WorkflowException.WorkflowAbandonedException ->
-                        code = "studioTaskAbandoned";
-                    is OnfidoWorkflow.WorkflowException.WorkflowBiometricTokenRetrievalException ->
-                        code = "tokenRetrievalFailed";
-                    is OnfidoWorkflow.WorkflowException.WorkflowBiometricTokenStorageException ->
-                        code = "biometricFailed";
-                    else -> code = "unknown"
-                }
-
-                call.reject("Onfido flow failed", code)
-            }
-        })
+        takePendingCall()?.reject("User Canceled the flow", code, data)
     }
 
+    private fun takePendingCall(): PluginCall? {
+        val call = pendingCall
+        pendingCall = null
+        return call
+    }
+
+    /** Maps Entrust IDV error types onto the codes Mythril already handles (OnfidoPluginErrorCode). */
+    private fun toErrorCode(type: ErrorType): String = when (type) {
+        ErrorType.PermissionsUnavailable,
+        ErrorType.CameraNotDetected,
+        ErrorType.CameraException -> "cameraPermission"
+        ErrorType.InvalidToken,
+        ErrorType.ExpiredToken -> "tokenExpired"
+        ErrorType.SdkVersionInsufficient,
+        ErrorType.WorkflowVersionMismatch -> "versionInsufficient"
+        ErrorType.UnsupportedError,
+        ErrorType.UnsupportedFeatureError -> "workflowUnsupported"
+        ErrorType.CertificatePinningFailed -> "invalidSSLCertificate"
+        ErrorType.ApiError,
+        ErrorType.NetworkException,
+        ErrorType.UploadError -> "workflowHttpException"
+        ErrorType.WorkflowTaskAbandoned -> "studioTaskAbandoned"
+        ErrorType.WorkflowTaskError -> "workflowUnknown"
+        ErrorType.BiometricTokenRetrievalCustomerUserHashMissing,
+        ErrorType.BiometricTokenRetrievalEncryptedBiometricTokenNotFound -> "tokenRetrievalFailed"
+        ErrorType.BiometricTokenStorageCustomerUserHashMissing,
+        ErrorType.BiometricTokenStorageEncryptedBiometricTokenMissing,
+        ErrorType.BiometricTokenStorageError -> "biometricFailed"
+        else -> "unknown"
+    }
+
+    companion object {
+        private const val TAG = "EntrustIdvWorkflow"
+    }
 }
