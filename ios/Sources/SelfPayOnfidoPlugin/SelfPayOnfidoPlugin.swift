@@ -1,6 +1,7 @@
 import Foundation
 import Capacitor
-import Onfido
+import EntrustIdv
+import EntrustCaptureAPI
 /**
  * Please read the Capacitor iOS Plugin Development Guide
  * here: https://capacitorjs.com/docs/plugins/ios
@@ -13,133 +14,134 @@ public class SelfPayOnfidoPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "startworkflow", returnType: CAPPluginReturnPromise)
     ]
     private let implementation = SelfPayOnfido()
+    // Kept alive for the duration of the flow; the SDK does not retain itself.
+    private var entrustIdv: EntrustIdv?
 
     @objc func startworkflow(_ call: CAPPluginCall) {
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            guard let sdkToken = call.getString("token"),
-                  !sdkToken.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-                call.reject("Missing required parameter: 'token'", "missingparameters")
-                return
-            }
+        guard let sdkToken = call.getString("token"),
+              !sdkToken.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            call.reject("Missing required parameter: 'token'", "missingparameters")
+            return
+        }
 
-            guard let workflowRunId = call.getString("workflowRunId"),
-                  !workflowRunId.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-                call.reject("Missing required parameter: 'workflowRunId'", "missingparameters")
-                return
-            }
+        guard let workflowRunId = call.getString("workflowRunId"),
+              !workflowRunId.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            call.reject("Missing required parameter: 'workflowRunId'", "missingparameters")
+            return
+        }
 
-            guard let language = call.getString("language"),
-                  !language.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-                call.reject("Missing required parameter: 'language'", "missingparameters")
-                return
-            }
+        guard let language = call.getString("language"),
+              !language.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            call.reject("Missing required parameter: 'language'", "missingparameters")
+            return
+        }
 
-            let responseHandler: (OnfidoResponse) -> Void = { [weak self] response in
-                var errorMessage = "An error occurred during the SDK flow."
-                if case let OnfidoResponse.error(error) = response {
+        // The Studio SDK token is bound to the workflow run, so the run id is not passed to the SDK.
+        CAPLog.print("[EntrustIdvWorkflow] Starting workflow run \(workflowRunId)")
 
-                    switch error {
-                    case OnfidoFlowError.microphonePermission:
-                        call.reject(errorMessage, "microphonePermission", nil, nil)
-                        return
-                    case OnfidoFlowError.cameraPermission:
-                        call.reject(errorMessage, "cameraPermission", nil, nil)
-                        return
-                    case OnfidoFlowError.failedToWriteToDisk:
-                        call.reject(errorMessage, "failedToWriteToDisk", nil, nil)
-                        return
-                    case OnfidoFlowError.versionInsufficient:
-                        call.reject(errorMessage, "versionInsufficient", nil, nil)
-                        return
-                    case OnfidoFlowError.studioTaskError:
-                        call.reject(errorMessage, "studioTaskError", nil, nil)
-                        return
-                    case OnfidoFlowError.studioTaskAbandoned:
-                        call.reject(errorMessage, "studioTaskAbandoned", nil, nil)
-                        return
-                    default:
-                        call.reject(errorMessage, "unknown", nil, nil)
-                        return
-                    }
-                } else if case OnfidoResponse.success = response {
-                    let result: [String: Any] = [
-                        "status": "success",
-                        "message": "SDK flow has been completed successfully"
-                    ]
-                    call.resolve(result)
-                } else if case OnfidoResponse.cancel = response {
-                    let result: [String: Any] = [
-                        "status": "error",
-                        "message": "Flow was canceled by the user"
-                    ]
-                    call.reject("User Canceled the flow","usercanceledflow", nil, nil)
-                }
-             }
-
-            let workflowConfiguration = WorkflowConfiguration(
-                workflowRunId: workflowRunId,
-                sdkToken: sdkToken
+        let parameters = StudioParameters(
+            sdkToken: sdkToken,
+            configuration: Configuration(
+                // Mythril only ships a dark theme
+                theme: Theme(mode: .dark),
+                localisation: Localisation(language: Self.toLanguageTag(language))
             )
+        )
 
-            // Onfido Studio exposes no `withLocale` on iOS, unlike Android's
-            // `WorkflowConfig.Builder.withLocale`, and its `languageCode` argument does not pick the
-            // language — the SDK resolves that from the bundle's preferred localizations, i.e. the
-            // device language. What it does honour is the *bundle* it reads strings from, so we hand
-            // it the SDK's own `<lang>.lproj` directly: every lookup then lands on that language
-            // with no resolution step involved.
-            if let localizationBundle = Self.getOnfidoLocalizationBundle(for: language) {
-                workflowConfiguration.withCustomLocalization(
-                    withTableName: "Localizable",
-                    in: localizationBundle
-                )
+        let callbacks = Callbacks(
+            onComplete: { [weak self] _ in
+                self?.entrustIdv = nil
+                call.resolve([
+                    "status": "success",
+                    "message": "SDK flow has been completed successfully"
+                ])
+            },
+            onError: { [weak self] error in
+                self?.entrustIdv = nil
+                let category = String(describing: error.type.category)
+                let name = String(describing: error.type)
+                CAPLog.print("[EntrustIdvWorkflow] Workflow failed: \(category)/\(name) \(error.message)")
+                call.reject("Onfido flow failed", Self.toErrorCode(error.type), nil, [
+                    "category": category,
+                    "name": name,
+                    "message": error.message
+                ])
+            },
+            onUserExit: { [weak self] userAction in
+                self?.entrustIdv = nil
+                call.reject("User Canceled the flow", Self.toErrorCode(userAction), nil, [
+                    "userAction": userAction.rawValue
+                ])
+            }
+        )
+
+        Task { @MainActor [weak self] in
+            guard let self = self else { return }
+            guard let viewController = self.bridge?.viewController else {
+                call.reject("Unable to access the main view controller.")
+                return
             }
 
-            let onfidoFlow = OnfidoFlow(workflowConfiguration: workflowConfiguration)
-                .with(responseHandler: responseHandler)
+            // Present modally on iPads, full screen everywhere else.
+            let presentationStyle: UIModalPresentationStyle = UIDevice.current.userInterfaceIdiom == .pad ? .formSheet : .fullScreen
 
-            do {
-                var modalPresentationStyle: UIModalPresentationStyle = .fullScreen
-
-                if UIDevice.current.userInterfaceIdiom == .pad {
-                    modalPresentationStyle = .formSheet // to present modally on iPads
-                }
-                guard let customerViewController = self.bridge?.viewController else {
-                    call.reject("Unable to access the main view controller.")
-                    return
-                }
-
-                try onfidoFlow.run(from: customerViewController, presentationStyle: modalPresentationStyle)
-            } catch let error {
-
-                call.reject("Starting onfido flow failed")
-            }
+            let sdk = EntrustIdv(sdkParameters: parameters, callbacks: callbacks)
+            self.entrustIdv = sdk
+            sdk.start(from: viewController, presentationStyle: presentationStyle)
         }
     }
 
-    /// Onfido publishes one set of language codes (`en_GB`, `zh_CN`, `nb`) but ships the iOS translations under BCP-47 `.lproj` names (`en-GB`, `zh-Hans`, `no`)
-    /// Therefore, we need to override the codes for those languages that don't have equivalent `.lproj` files.
-    /// e.g. `en_US` is not shipped, but `en.lproj` is, so we override it to `en`.
-    /// See: https://documentation.identity.entrust.com/sdk/sdk-customization/#language-customization
-    /// See: https://github.com/onfido/onfido-ios-sdk/tree/master/localization
-    private static let languageCodeOverrides = [
-        "en_US": "en",
-        "nb": "no",
-        "zh_CN": "zh-Hans",
-        "zh_TW": "zh-Hant"
-    ]
+    /// Mythril sends the Onfido language codes (`en_GB`, `pt_BR`), while the Entrust IDV SDK
+    /// ships its translations under lowercase, hyphenated tags (`en-gb`, `pt-br`, `ro`).
+    private static func toLanguageTag(_ language: String) -> String {
+        language.trimmingCharacters(in: .whitespacesAndNewlines)
+            .replacingOccurrences(of: "_", with: "-")
+            .lowercased()
+    }
 
-    /// Returns the SDK's own `<code>.lproj` as a bundle, or `nil` to leave the flow on the device
-    /// language. `Bundle(for: OnfidoFlow.self)` must resolve to Onfido.framework — if the SDK is
-    /// ever linked statically it becomes the app bundle, no `.lproj` is found, and every flow
-    /// silently falls back to the device language.
-    private static func getOnfidoLocalizationBundle(for language: String) -> Bundle? {
-        let trimmedLanguage = language.trimmingCharacters(in: .whitespacesAndNewlines)
-        let code = languageCodeOverrides[trimmedLanguage] ?? trimmedLanguage.replacingOccurrences(of: "_", with: "-")
-        guard let lprojPath = Bundle(for: OnfidoFlow.self).path(forResource: code, ofType: "lproj") else {
-            return nil
+    /// Maps Entrust IDV error types onto the codes Mythril already handles (OnfidoPluginErrorCode).
+    private static func toErrorCode(_ type: IdvErrorType) -> String {
+        switch type {
+        case .cameraPermissionDenied, .permissionsUnavailable, .cameraNotDetected, .cameraException:
+            return "cameraPermission"
+        case .microphonePermissionDenied:
+            return "microphonePermission"
+        case .invalidToken, .expiredToken:
+            return "tokenExpired"
+        case .sdkVersionInsufficient, .workflowVersionMismatch:
+            return "versionInsufficient"
+        case .unsupportedError, .unsupportedFeatureError:
+            return "workflowUnsupported"
+        case .certificatePinningFailed:
+            return "invalidSSLCertificate"
+        case .apiError, .networkException, .uploadError:
+            return "workflowHttpException"
+        case .workflowTaskAbandoned:
+            return "studioTaskAbandoned"
+        case .workflowTaskError:
+            return "workflowUnknown"
+        case .failedToWriteToDisk:
+            return "failedToWriteToDisk"
+        case .biometricTokenRetrievalCustomerUserHashMissing,
+             .biometricTokenRetrievalEncryptedBiometricTokenNotFound:
+            return "tokenRetrievalFailed"
+        case .biometricTokenStorageCustomerUserHashMissing,
+             .biometricTokenStorageEncryptedBiometricTokenMissing,
+             .biometricTokenStorageError:
+            return "biometricFailed"
+        default:
+            return "unknown"
         }
+    }
 
-        return Bundle(path: lprojPath)
+    private static func toErrorCode(_ userAction: UserAction) -> String {
+        switch userAction {
+        case .permissionsDenied:
+            return "cameraPermission"
+        case .requiredNFCFlowNotCompleted:
+            return "workflowcanceled"
+        default:
+            return "usercanceledflow"
+        }
     }
 }

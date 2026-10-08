@@ -12,6 +12,7 @@
     "dist/",
     "ios/Sources",
     "ios/Tests",
+    "ios/spm_dependency.rb",
     "Package.swift",
     "SelfpaynowOnfido.podspec"
   ],
