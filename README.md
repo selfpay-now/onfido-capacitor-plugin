@@ -9,6 +9,18 @@ npm install selfpaynow-onfido
 npx cap sync
 ```
 
+## Entrust IDV SDK versions
+
+Android and iOS are released on separate schedules, so the pair is pinned deliberately:
+
+| Platform | Version | Where |
+|----------|---------|-------|
+| Android  | 100.18.0 | `android/build.gradle` (`entrustIdvVersion`) |
+| iOS      | 100.19.0 | `ios/spm_dependency.rb` (`ENTRUST_IDV_SPM_VERSION`) and `Package.swift` |
+
+On iOS the SDK is distributed only through Swift Package Manager; the app's Podfile must call
+`selfpaynow_onfido_spm_post_install(installer)` from `ios/spm_dependency.rb` in `post_install`.
+
 ## API
 
 <docgen-index>

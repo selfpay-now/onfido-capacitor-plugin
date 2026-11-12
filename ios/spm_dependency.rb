@@ -10,7 +10,7 @@
 
 # Keep in sync with Package.swift
 ENTRUST_IDV_SPM_URL = 'https://github.com/entrustCorporation/IdvSdk-iOS'.freeze
-ENTRUST_IDV_SPM_VERSION = '100.17.0'.freeze
+ENTRUST_IDV_SPM_VERSION = '100.19.0'.freeze
 # Studio workflows resolve their tasks at runtime, so every task module the workflow may use is needed.
 ENTRUST_IDV_SPM_PRODUCTS = %w[EntrustIdv Welcome Consent Document NFC FacePhoto FaceMotion Retry].freeze
 

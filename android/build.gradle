@@ -68,7 +68,7 @@ dependencies {
     // Entrust IDV SDK (successor of the Onfido Smart Capture SDK). Studio workflows resolve their
     // tasks at runtime, so every task module the workflow may use has to be on the classpath;
     // a missing one surfaces as ErrorType.ModuleLoadError.
-    def entrustIdvVersion = '100.16.0'
+    def entrustIdvVersion = '100.18.0'
     implementation "com.entrust.identity.verification.sdk:core:$entrustIdvVersion"
     implementation "com.entrust.identity.verification.sdk:welcome:$entrustIdvVersion"
     implementation "com.entrust.identity.verification.sdk:consent:$entrustIdvVersion"

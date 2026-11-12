@@ -12,7 +12,7 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/ionic-team/capacitor-swift-pm.git", branch: "main"),
         // Keep in sync with ENTRUST_IDV_SPM_VERSION in ios/spm_dependency.rb
-        .package(url: "https://github.com/entrustCorporation/IdvSdk-iOS", exact: "100.17.0")
+        .package(url: "https://github.com/entrustCorporation/IdvSdk-iOS", exact: "100.19.0")
     ],
     targets: [
         .target(
